@@ -40,7 +40,7 @@ class Deck():
             self.deck.append(Card(0, ''))
         self._shuffled_deck = []
         
-    def print_deck(self):
+    def print_deck(self):       
         for card in self._shuffled_deck:
             print(card)
             
