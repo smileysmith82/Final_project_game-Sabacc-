@@ -58,6 +58,16 @@ class Hand():
     def __init__(self, beginning_size = 2):
         player1_hand = []
         player2_hand = []
+        draw_pile =self._shuffled_deck
+        discard_pile = []
+    def deal():
+        pass
+
+    def draw():
+        pass
+
+    def discard():
+        pass
         
         
             
