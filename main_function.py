@@ -21,9 +21,11 @@ class Card():
         
         if self.rank == 0:
             return("Sylops")
-        else:
-            return f"{self.rank} of {self.suit}"
-    
+        elif self.rank > 0:
+            return f"Green +{self.rank}"
+        elif self.rank < 0:
+            return f"Red {self.rank}"
+        
 
 
 class Deck():
@@ -36,16 +38,26 @@ class Deck():
                 self.deck.append(Card(-rank,suit))
         for i in range (2):
             self.deck.append(Card(0, ''))
+        self._shuffled_deck = []
+        
     def print_deck(self):
-        for card in self.deck:
+        for card in self._shuffled_deck:
             print(card)
             
     def get_deck_length(self):
         return len(self.deck)
+    
+    
+    def shuffle(self):
+        self._shuffled_deck = copy.deepcopy(self.deck)
+        random.shuffle(self._shuffled_deck)
+        return self._shuffled_deck
+        
+            
         
             
 deck = Deck()
-deck.print_deck()        
+deck.shuffle()
+deck.print_deck()
 
-
-print(f"Length of Deck:", deck.get_deck_length())
+#print(f"Length of Deck:", deck.get_deck_length())
