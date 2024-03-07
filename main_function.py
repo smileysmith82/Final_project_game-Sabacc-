@@ -53,7 +53,12 @@ class Deck():
         random.shuffle(self._shuffled_deck)
         return self._shuffled_deck
         
-            
+        
+class Hand():
+    def __init__(self, beginning_size = 2):
+        player1_hand = []
+        player2_hand = []
+        
         
             
 deck = Deck()
@@ -61,3 +66,6 @@ deck.shuffle()
 deck.print_deck()
 
 #print(f"Length of Deck:", deck.get_deck_length())
+
+
+
