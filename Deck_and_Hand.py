@@ -10,20 +10,20 @@ class Card():
 
 
         if self.suit == 'C':
-            self.suit_name = 'circle'
+            self.suit_name = 'Circle'
         elif self.suit == 'S':
-            self.suit_name = 'square'
+            self.suit_name = 'Square'
         elif self.suit == 'T':
-            self.suit_name = "triangle"
+            self.suit_name = "Triangle"
             
     def __str__(self):
         
         if self.rank == 0:
             return("Sylops")
         elif self.rank > 0:
-            return f"Green +{self.rank}"
+            return f"Green +{self.rank} of {self.suit_name}"
         elif self.rank < 0:
-            return f"Red {self.rank}"
+            return f"Red {self.rank} of {self.suit_name}"
         
 
 
@@ -57,17 +57,20 @@ class Hand():
     def __init__(self, shuffled_deck, beginning_size = 2):
         self.player1_hand = []
         self.player2_hand = []
-        self.draw_pile =self.shuffled_deck
+        self.draw_pile =shuffled_deck
         self.discard_pile = []
+        self.beginning_size = beginning_size
         
-    def starting_deal(self,hand):
-        for _ in range(beginning_size):
+    def starting_deal(self,shuffled_deck):
+        for i in range(self.beginning_size):
             self.player1_hand.append(self.draw_pile.pop())
-            self.player1_hand.append(self.draw_pile.pop())
-    def total_of_hand1(self,hand):
+            self.player2_hand.append(self.draw_pile.pop())
+        self.discard_pile.append(self.draw_pile.pop())
+    
+    def total_of_hand(self,hand):
         hand_total=0
-        for cards in hand():
-            hand_total += card.rank
+        for cards in hand:
+            hand_total += cards.rank
         return hand_total
     
     def total_player1(self):
@@ -103,6 +106,24 @@ class Dice():
             #pass #go to the next player's  turn
         
         
+def main():
+    deck = Deck()
+    deck.shuffle()
+    hand = Hand(deck.shuffled_deck)
+    hand.starting_deal(2)
+    player1 = hand.player1_hand
+    player2 = hand.player2_hand
+    print("Player 1 Hand: ")
+    for cards in player1:
+        print(cards)
         
-dice = Dice()
-dice.roll_dice()
+    print("\nPlayer 2 Hand: ")
+    for cards in player2:
+        print(cards)
+    
+    print("\nTop of Discard")
+    top_of_discard = hand.discard_pile[-1] if hand.discard_pile else None
+    print(top_of_discard)
+    
+if __name__ == "__main__":
+    main()
