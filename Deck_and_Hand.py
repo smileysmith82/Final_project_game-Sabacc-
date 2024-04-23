@@ -52,7 +52,7 @@ class Hand():
         self.player2_hand = []
         self.draw_pile =shuffled_deck
         self.discard_pile = []
-        self.beginning_size = beginning_size
+        self.beginning_size = beginning_siz
         
     def starting_deal(self,shuffled_deck):
         for i in range(self.beginning_size):
@@ -71,18 +71,24 @@ class Hand():
     def total_player2(self):
         return self.total_of_hand(self.player2_hand)
     
-    def deal(self, hand_size, shuffled_deck):
-        dealt_cards = random.sample(shuffled_deck.items(), hand_size)
-        return dealt_cards
-
     def draw(self, hand_size, shuffled_deck):
-        dealt_cards = random.sample(shuffled_deck.items(), hand_size)
-        return dealt_cards
+        if turn == Player 1:
+            self.player1_hand.append(self.draw_pile.pop())
+        elif turn == Player 2:
+            self.player2_hand.append(self.draw_pile.pop())
 
-    def discard(self, player1_hand, card_to_discard):
-        if card_to_discard in player1_hand:
+    def discard(self, player1_hand, player2_hand, card_to_discard):
+        """self.player1_hand.append(self.draw_pile.pop())"""
+        selected_card = None
+        if turn == Player1:
+            self.draw_pile.append(self.player1_hand.pop())
+        elif turn == Player2:
+            self.draw_pile.append(self.player2_hand())
+            
             discarded_card = (card_to_discard, player1_hand.pop(card_to_discard))
-        return discarded_card 
+        if card_to_discard in player2_hand:
+            discarded_card = (card_to_discard, player2_hand.pop(card_to_discard))
+        return discarded_card """
     
 class Dice():
     def __init__(self):
@@ -98,10 +104,13 @@ class Dice():
         if dice1 == dice2:
             are_same = True
             print("The dice were the same")
-            self.starting_deal(shuffled_deck)
+            
+            #discard hands
+            #deal cards equal to the number of cards discarded
             #pass #Redeal the hands
         else:
             print("The dice were not the same")
+            end_turn()
             #pass #go to the next player's  turn
         
         
