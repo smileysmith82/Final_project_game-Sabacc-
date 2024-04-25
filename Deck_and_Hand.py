@@ -102,15 +102,15 @@ class Dice():
         print(dice1)
         print(dice2)
         if dice1 == dice2:
-            are_same = True
             print("The dice were the same")
+            
             
             #discard hands
             #deal cards equal to the number of cards discarded
-            #pass #Redeal the hands
+            #pass #Redeal the hands #end_turn()
         else:
             print("The dice were not the same")
-            end_turn()
+            #end_turn()
             #pass #go to the next player's  turn
         
         
