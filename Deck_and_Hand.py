@@ -16,10 +16,13 @@ class Card():
             
     def __str__(self):
         if self.rank == 0:
+            file_name = "sylops.png"
             return "Sylops"
         elif self.rank > 0:
+            file_name = f"g_{self.rank}_{self.suit_name.lower()}.py"
             return f"Green +{self.rank} of {self.suit_name}"
-        elif self.rank < 0:
+        elif self.rank < 0: 
+            file_name = f"r_{self.rank}_{self.suit.lower()}.py"
             return f"Red {self.rank} of {self.suit_name}"
         
 class Deck():
@@ -82,9 +85,9 @@ class Player_Actions():
         turn = player_turn[turn_index]
         
     def draw(self, player1_hand, player2_hand, draw_pile):
-        if turn == Player 1:
+        if turn == Player1:
             self.player1_hand.append(self.draw_pile.pop())
-        elif turn == Player 2:
+        elif turn == Player2:
             self.player2_hand.append(self.draw_pile.pop())
         
 
@@ -158,17 +161,26 @@ def main():
     print("\nPlayer 2 Hand: ")
     for cards in player2:
         print(cards)
-    
     print("\nTop of Discard")
     top_of_discard = hand.discard_pile[-1] if hand.discard_pile else None
     print(top_of_discard)
     
 if __name__ == "__main__":
-    main()    
+    main()
     
-#Hover value
-#select card for discard, swap to top card of discard.
-
+    
+    
+    
+    
+    
+    
+    
+    #Hover value
+    #select card for discard, swap to top card of discard.
+    """switch():
+    select to switch:
+    select card from hand:
+    swap selected card with last card added to discard_pile
 
 
 
