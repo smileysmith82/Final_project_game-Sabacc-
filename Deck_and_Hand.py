@@ -5,7 +5,7 @@ class Card():
     def __init__(self, rank, suit):
         self.rank= int(rank)
         self.suit= suit
-        self.selected = False
+
 
         if self.suit == 'C':
             self.suit_name = 'Circle'
@@ -56,13 +56,22 @@ class Hand():
         self.draw_pile =shuffled_deck
         self.discard_pile = []
         self.beginning_size = beginning_size
+        self.top_of_discard = None
+        
         
     def starting_deal(self,shuffled_deck):
         for i in range(self.beginning_size):
             self.player1_hand.append(self.draw_pile.pop())
             self.player2_hand.append(self.draw_pile.pop())
         self.discard_pile.append(self.draw_pile.pop())
+        self.update_discard()
     
+    def update_discard(self):
+        if self.discard_pile:
+            self.top_of_discard= self.discard_pile[-1]
+        else:
+            self.top_of_discard = None
+            
     def total_of_hand(self,hand):
         hand_total=0
         for cards in hand:
@@ -76,76 +85,99 @@ class Hand():
     
     
 class Player_Actions():
-    def __init__(self,player1_hand, player2_hand, turn):
+    def __init__(self, player1_hand, player2_hand, hand):
         self.player1_hand = player1_hand
         self.player2_hand = player2_hand
-        self.player_turn = [Player1, Player2]
-        idx = 0
-        turn_index = idx % (len(turn)+1)
-        turn = player_turn[turn_index]
+        self.hand = hand
+        self.player_turn = ["Player1", "Player2"]
+        self.current_player = "Player1"
+        self.num_players = len(self.player_turn)
+        self.idx = 0
+        self.dice = Dice(self,hand)
         
-    def draw(self, player1_hand, player2_hand, draw_pile):
-        if turn == Player1:
-            self.player1_hand.append(self.draw_pile.pop())
-        elif turn == Player2:
-            self.player2_hand.append(self.draw_pile.pop())
+    def next_turn(self):
+        self.idx += 1
+        self.current_player = self.player_turn[self.idx % self.num_players]
+        
+    def draw(self):
+        if self.current_player == "Player1":
+            self.player1_hand.append(self.hand.draw_pile.pop())
+            self.next_turn()
+            
+        elif self.current_player == "Player2":
+            self.player2_hand.append(self.hand.draw_pile.pop())
+            self.dice.roll_dice()
         
 
     def switch(self, player1_hand, player2_hand, selected_card):
         self.player1_hand.append(self.draw_pile.pop())
         
-        if turn == Player1:
-            #select_card()
-            self.player1_hand.append(self.discard_pile.pop())
-            self.discard_pile.append(self.player1_hand.pop(selected_card))
+        if self.current_player == "Player1":
+            if selected_card_index is not None and len(discard_pile) > 0 and 0 <= selected_card_index < len(player_hand):
+                selected_card = player_hand[selected_card_index]
+                player_hand[selected_card_index] = discard_pile.pop()
+                discard_pile.append(selected_card)            
+            self.next_turn()
             
-        elif turn == Player2:
-            #select_card()
-            self.player2_hand.append(self.discard_pile.pop())
-            self.discard_pile.append(self.player2_hand.pop(selected_card))
-        self.idx +=1
+        elif self.current_player == "Player2":
+            opponent_ai.switch()
+            self.dice.roll_dice()
         
-    def discard_hand(self, player1_hand, player2_hand, turn):
-        original1 = len(player1_hand)
+    def stand():
+        if self.current_player == "Player1":
+            self.next_turn()
+        elif self.current_player == "Player2":
+            self.Dice.roll_dice()
         
-        original2 = len(player2_hand)
-        if turn == Player1:
-            for _ in original1:
-                discard_pile.append(self.player1_hand.pop())
-        elif turn == Player2:
-            for _ in original2:
-                discard_pile.append(self.player2_hand.pop())
-
+    def discard_hand(self):
+        original1 = len(self.player1_hand)
+        original2 = len(self.player2_hand)
+        if self.current_player == "Player1":
+            for _ in range(original1):
+                self.hand.discard_pile.append(self.player1_hand.pop())
+            self.hand.update_discard()
+        elif self.current_player == 'Player2':
+            for _ in range(original2):
+                self.hand.discard_pile.append(self.player2_hand.pop())
+            self.hand.update_discard()
+                
     def fold(self):
-    #discard whole hand:
-    #end game (if more players, continue without player who folds)
-        discard_hand()
-        
+        self.discard_hand()
+        self.stand()
     
 class Dice():
-    def __init__(self):
+    def __init__(self, player_actions, hand):
         self.die1 = [1,2,3,4,5,6]
         self.die2 = [1,2,3,4,5,6]
+        self.round_counter = 1
+        self.idx = 0
+        self.player_actions = player_actions
+        self.turn = player_actions
+        self.hand = hand
+
         
-    def roll_dice(self, round_counter):
-        dice1= random.choice(self.die1)
-        dice2= random.choice(self.die2)
-        print(dice1)
-        print(dice2)
+    def roll_dice(self):
+        dice1 = random.choice(self.die1)
+        dice2 = random.choice(self.die2)
         if dice1 == dice2:
             print("The dice were the same")
-            discard_hand()
-            for _ in original1:
-                draw(player1)
-            for _ in original2:
-                draw(player2)
-                   
+            original1 = len(self.player_actions.hand.player1_hand)
+            original2 = len(self.player_actions.hand.player2_hand)
+            self.player_actions.discard_hand()
+            self.player_actions.next_turn()
+            self.player_actions.discard_hand()# Should now be player 1's turn
+
+            for _ in range(original1):
+                self.player_actions.draw()
+            self.player_actions.next_turn()
+            for _ in range(original2):
+                self.player_actions.draw()
+            self.player_actions.next_turn()
         else:
             print("The dice were not the same")
-            #end_turn()
-            
-        round_counter += 1
-        
+            self.idx += 1
+        self.round_counter += 1
+
         
 def main():
     deck = Deck()
@@ -154,6 +186,7 @@ def main():
     hand.starting_deal(2)
     player1 = hand.player1_hand
     player2 = hand.player2_hand
+    turn = "Player1"
     print("Player 1 Hand: ")
     for cards in player1:
         print(cards)
@@ -162,29 +195,15 @@ def main():
     for cards in player2:
         print(cards)
     print("\nTop of Discard")
-    top_of_discard = hand.discard_pile[-1] if hand.discard_pile else None
-    print(top_of_discard)
-    
+    hand.update_discard()
+    print(hand.top_of_discard)
+    player_actions = Player_Actions(player1, player2, hand)  # Create an instance of Player_Actions
+
+    dice = Dice(player_actions, hand)
+    dice.roll_dice()      
+    for cards in player1:
+        print(cards)
 if __name__ == "__main__":
     main()
-    
-    
-    
-    
-    
-    
-    
-    
-    #Hover value
-    #select card for discard, swap to top card of discard.
-    """switch():
-    select to switch:
-    select card from hand:
-    swap selected card with last card added to discard_pile
 
 
-
-file_name = color_number_suit
-            r_8_t.png
-"""
-    #
