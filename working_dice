@@ -110,7 +110,7 @@ class Player_Actions():
         elif self.current_player == "Player2":
             self.player2_hand.append(self.hand.draw_pile.pop())
             self.hand.player2_len += 1
-            #self.dice.roll_dice()
+            self.dice.roll_dice()
             
     def draw_after_dice(self):
         if self.current_player == "Player1":
@@ -120,7 +120,7 @@ class Player_Actions():
             self.player2_hand.append(self.hand.draw_pile.pop())
    
         
-    '''
+    
     def switch(self, player1_hand, player2_hand, selected_card):
         self.player1_hand.append(self.draw_pile.pop())
         
@@ -134,7 +134,7 @@ class Player_Actions():
         elif self.current_player == "Player2":
             opponent_ai.switch()
             self.dice.roll_dice()
-    '''
+    
     def stand():
         if self.current_player == "Player1":
             self.next_turn()
@@ -166,8 +166,7 @@ class Dice():
 
     def roll_dice(self):
         dice1 = random.choice(self.die1)
-        dice2 = dice1
-        #dice2 = random.choice(self.die2)
+        dice2 = random.choice(self.die2)
         if dice1 == dice2:
             print("The dice were the same")
             self.player_actions.discard_hand()
