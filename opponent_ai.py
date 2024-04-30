@@ -1,4 +1,3 @@
-import math
 import random
 import Deck_and_Hand
             
@@ -21,20 +20,7 @@ class AI_Player():
             for card in self.hand:
                 new_total = (total - card.rank)
                 if new_total + discard_top.rank <= abs(1):
-                    return True
-        return False
-
-    def make_move(self, discard_top, draw_pile):
-        if self.check_if_stand():
-            Deck_and_Hand.stand()
-        elif self.check_if_switch(discard_top):
-            switch()
-        else:
-            Deck_and_Hand.draw()
-
-            
-            
-            
-
-
-
+                    player2_hand.append(discard_pile[-1])
+                    discard_pile.pop()
+                    dealer_hand.append('down_backside.png')
+        pass
