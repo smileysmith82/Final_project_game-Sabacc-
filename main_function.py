@@ -1,29 +1,28 @@
-import pygame
+import random
+import pygame 
 
 WIDTH, HEIGHT = 1000, 800
 WIN = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Sabacc")
 
-# Define the desired resolution for the images
-IMAGE_WIDTH, IMAGE_HEIGHT = 100, 133
+IMAGE_WIDTH, IMAGE_HEIGHT = 100, 133 # resolution of card images
 
-# Load background image
-BG = pygame.transform.scale(pygame.image.load("Green_background.jpg"), (WIDTH, HEIGHT))
+BG = pygame.transform.scale(pygame.image.load("Green_background.jpg"), (WIDTH, HEIGHT)) # Load background image
 
 pygame.init()
 
-round_counter = 1
+round_counter = 0
+
 discard_pile = ['r_10_t.png', 'g_2_s.png']
-player_hand = ['r_10_s.png', 'sylops.png']
+player1_hand = ['r_10_s.png', 'sylops.png',]
+player2_hand = ['g_4_t.png', 'r_2_s.png']
 dealer_hand = ['down_backside.png', 'down_backside.png']
 
-# Function to load images with desired resolution
 def load_image(image_path):
     image = pygame.image.load(image_path)
     return pygame.transform.scale(image, (IMAGE_WIDTH, IMAGE_HEIGHT))
 
-# Load card images with desired resolution
-card_images = {card: load_image(card) for card in discard_pile + player_hand + dealer_hand}
+card_images = {card: load_image(card) for card in discard_pile + player1_hand + dealer_hand} # Load card images
 
 def display_dealer_hand(hand):
     card_spacing = 20
@@ -65,10 +64,23 @@ def draw_button(screen, font, text, color, x, y, color_light=None, color_dark=No
 
     text_rect = text_render.get_rect(center=button_rect.center)
     screen.blit(text_render, text_rect)
+    
+def end_game(player1_hand, player2_hand):
+    player1_total = self.Hand.player1_hand()
+    player2_total = self.Hand.player2_hand()
+    
+    winner_text = ""
+    if player1_total < player2_total:
+        winner_text = "You Win!"
+    elif player1_total > player2_total:
+        winner_text = "You Lose!"
+    else:
+        winner_text = "It's a tie!"
 
-def round_count():
-    global round_counter
-    round_counter += 1
+    total_text_player1 = f"Your total: {player1_total}"
+    total_text_player2 = f"Dealer's total: {player2_total}"
+
+    return winner_text, total_text_player1, total_text_player2
 
 def quit_function():
     print("Quitting")
@@ -81,14 +93,13 @@ def draw_function():
     print("Draw")
 
 def switch_function(selected_card_index):
-    print("Switch")
-    global discard_pile, player_hand
-    if selected_card_index is not None and len(discard_pile) > 0 and 0 <= selected_card_index < len(player_hand):
-        selected_card = player_hand[selected_card_index]
-        player_hand[selected_card_index] = discard_pile.pop()
+    global discard_pile, player1_hand
+    if selected_card_index is not None and len(discard_pile) > 0 and 0 <= selected_card_index < len(player1_hand):
+        selected_card = player1_hand[selected_card_index]
+        player1_hand[selected_card_index] = discard_pile.pop()
         discard_pile.append(selected_card)
 
-    print(player_hand)
+    print(player1_hand)
     print(discard_pile)
 
 def fold_function():
@@ -122,7 +133,6 @@ def detect_hover(mouse_pos, hand, x_offset, y_offset, discard_rect, discard_pile
     for i, card in enumerate(hand):
         card_rect = pygame.Rect(x_offset + i * (card_width + card_spacing), y_offset, card_width, card_height)
         if card_rect.collidepoint(mouse_pos):
-            # Handle sylops card separately
             if card == "sylops.png":
                 return "Sylops (0)"
             else:
@@ -137,7 +147,6 @@ def detect_hover(mouse_pos, hand, x_offset, y_offset, discard_rect, discard_pile
     # Check if the mouse is over the discard pile
     if discard_rect.collidepoint(mouse_pos):
         if discard_pile:
-            # Check if the top card in the discard pile is "sylops"
             if discard_pile[-1] == "sylops.png":
                 return "Sylops (0)"
             else:
@@ -152,7 +161,21 @@ def detect_hover(mouse_pos, hand, x_offset, y_offset, discard_rect, discard_pile
             return "Empty discard pile"
     
     return None
+#in deck and hand file (REMOVE)
+class Dice():
+    def __init__(self):
+        self.die1 = [1,2,3,4,5,6]
+        self.die2 = [1,2,3,4,5,6]
+        
+    def roll_dice(self, round_counter):
+        dice1= random.choice(self.die1)
+        dice2= random.choice(self.die2)
+            
+        round_counter += 1
+        
+        return dice1, dice2, round_counter
 
+dice = Dice()
 
 def main():
     global round_counter
@@ -172,6 +195,9 @@ def main():
     discard_rect = pygame.Rect((WIDTH - IMAGE_WIDTH * 2 - 20) // 2 + 120, 250, IMAGE_WIDTH, IMAGE_HEIGHT)
     selected_card_index = None
     switch_button_clicked = False  # Flag to track switch button click
+    
+    # Roll the dice and update round counter
+    dice1, dice2, round_counter = dice.roll_dice(round_counter) 
 
     while run:
         mouse_pos = pygame.mouse.get_pos()
@@ -201,10 +227,10 @@ def main():
                 if switch_button_clicked:  # Check if switch button is clicked
                     card_spacing = 20
                     card_width, card_height = IMAGE_WIDTH, IMAGE_HEIGHT
-                    hand_width = len(player_hand) * card_width + (len(player_hand) - 1) * card_spacing
+                    hand_width = len(player1_hand) * card_width + (len(player1_hand) - 1) * card_spacing
                     x_offset = (WIDTH - hand_width) // 2
                     y_offset = HEIGHT - 300
-                    for i in range(len(player_hand)):
+                    for i in range(len(player1_hand)):
                         card_rect = pygame.Rect(x_offset + i * (card_width + card_spacing), y_offset, card_width, card_height)
                         if card_rect.collidepoint(event.pos):
                             selected_card_index = i
@@ -216,20 +242,20 @@ def main():
         WIN.blit(BG, (0, 0))
 
         quit_button(WIN, font, 'Quit', WIDTH - 120, 20, (255, 0, 0), (200, 0, 0))
-
-        round_text = font.render("Round: " + str(round_counter), True, color)
+        
+        round_text = font.render(f"Round: {round_counter} Dice 1: {dice1} Dice 2: {dice2}", True, color)
         WIN.blit(round_text, (20, 20))
 
         draw_button(WIN, font, 'Start', color, button_x, button_y, color_light_blue, color_dark_blue)
         for i, label in enumerate(["Draw", "Switch", "Fold", "Stand"], start=1):
             draw_button(WIN, font, label, color, button_x - i * (140 + button_spacing), button_y, color_light_blue, color_dark_blue)
 
-        display_hand(player_hand)
+        display_hand(player1_hand)
         display_dealer_hand(dealer_hand)
         display_deck()
         display_discard(discard_pile)
 
-        hovered_card_player = detect_hover(mouse_pos, player_hand, (WIDTH - len(player_hand) * IMAGE_WIDTH - (len(player_hand) - 1) * 20) // 2, HEIGHT - 300, discard_rect, discard_pile)
+        hovered_card_player = detect_hover(mouse_pos, player1_hand, (WIDTH - len(player1_hand) * IMAGE_WIDTH - (len(player1_hand) - 1) * 20) // 2, HEIGHT - 300, discard_rect, discard_pile)
         if hovered_card_player:
             if hovered_card_player == "discard_pile":
                 if discard_pile:
@@ -242,6 +268,47 @@ def main():
 
         pygame.display.flip()
         clock.tick(60)
+        if round_counter >= 4:
+            winner_text, total_text_player1, total_text_player2 = end_game(player1_hand, player2_hand)
+            winner_render = font.render(winner_text, True, (255, 0, 0))
+            total_render_player1 = font.render(total_text_player1, True, (255, 0, 0))
+            total_render_player2 = font.render(total_text_player2, True, (255, 0, 0))
+
+            # Display winner and totals on the screen
+            WIN.blit(winner_render, (WIDTH // 2 - winner_render.get_width() // 2, HEIGHT // 2 - 60))
+            WIN.blit(total_render_player1, (WIDTH // 2 - total_render_player1.get_width() // 2, HEIGHT // 2))
+            WIN.blit(total_render_player2, (WIDTH // 2 - total_render_player2.get_width() // 2, HEIGHT // 2 + 60))
+
+            pygame.display.flip()
+
+            # Wait for the player to quit the game
+            while True:
+                mouse_pos = pygame.mouse.get_pos()
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        run = False
+                        break
+                    elif event.type == pygame.MOUSEBUTTONDOWN:
+                        # Check if the quit button is clicked
+                        if WIDTH - 120 < event.pos[0] < WIDTH - 20 and 20 < event.pos[1] < 60:
+                            print("quitting")
+                            run = False
+                            break
+
+                # Check if the quit button is hovered over
+                quit_button_rect = pygame.Rect(WIDTH - 120, 20, 100, 40)
+                if quit_button_rect.collidepoint(mouse_pos):
+                    quit_button(WIN, font, 'Quit', WIDTH - 120, 20, (255, 0, 0), (255, 100, 100))  # Change color if hovered
+                else:
+                    quit_button(WIN, font, 'Quit', WIDTH - 120, 20, (255, 0, 0), (200, 0, 0))  # Reset to default color
+
+                pygame.display.flip()
+                
+                if not run:
+                    break
+
+            if not run:
+                break
 
     pygame.quit()
 
