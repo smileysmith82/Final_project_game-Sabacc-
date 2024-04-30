@@ -15,7 +15,7 @@ pygame.init()
 round_counter = 1
 discard_pile = ['r_10_t.png', 'g_2_s.png']
 player_hand = ['r_10_s.png', 'sylops.png']
-dealer_hand = ['up_backside.png', 'up_backside.png']
+dealer_hand = ['down_backside.png', 'down_backside.png']
 
 # Function to load images with desired resolution
 def load_image(image_path):
@@ -73,6 +73,9 @@ def round_count():
 def quit_function():
     print("Quitting")
     pygame.quit()
+    
+def stand_function():
+    print("stand")
 
 def draw_function():
     print("Draw")
@@ -176,7 +179,7 @@ def main():
             if event.type == pygame.QUIT:
                 run = False
             elif event.type == pygame.MOUSEBUTTONDOWN:
-                for i in range(4):
+                for i in range(5):
                     button_rect = pygame.Rect(button_x - i * (140 + button_spacing), button_y, 140, 40)
                     if button_rect.collidepoint(event.pos):
                         if i == 0:
@@ -187,6 +190,8 @@ def main():
                             switch_button_clicked = True  # Flag to track switch button click
                         elif i == 3:
                             fold_function()
+                        elif i == 4:
+                            stand_function()
 
                 new_button_rect = pygame.Rect(WIDTH - 120, 20, 100, 40)
                 if new_button_rect.collidepoint(event.pos) and not quit_button_clicked:
@@ -216,7 +221,7 @@ def main():
         WIN.blit(round_text, (20, 20))
 
         draw_button(WIN, font, 'Start', color, button_x, button_y, color_light_blue, color_dark_blue)
-        for i, label in enumerate(["Draw", "Switch", "Fold"], start=1):
+        for i, label in enumerate(["Draw", "Switch", "Fold", "Stand"], start=1):
             draw_button(WIN, font, label, color, button_x - i * (140 + button_spacing), button_y, color_light_blue, color_dark_blue)
 
         display_hand(player_hand)
