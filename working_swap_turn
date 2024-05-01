@@ -91,7 +91,7 @@ class Player_Actions():
         self.hand = hand
         self.player_turn = ["Player1", "Player2"]
         self.num_players = len(self.player_turn)
-        self.current_player_idx = 1
+        self.current_player_idx =0
         self.dice = Dice(self,hand)
         
     def next_turn(self):
@@ -155,10 +155,9 @@ class Player_Actions():
     
 class Dice():
     def __init__(self, player_actions, hand):
-        self.die1 = [1,2,3,4,5,6]
-        self.die2 = [1,2,3,4,5,6]
+        self.die1 = [1]#,2,3,4,5,6]
+        self.die2 = [1]#,2,3,4,5,6]
         self.round_counter = 1
-        self.idx = 0
         self.player_actions = player_actions
         self.current_player = player_actions.current_player
         self.hand = hand
@@ -204,8 +203,14 @@ def main():
     hand.update_discard()
     print(hand.top_of_discard)
     player_actions = Player_Actions(player1, player2, hand)  # Create an instance of Player_Actions
+    player_actions.draw()
     dice = Dice(player_actions, hand)
-    dice.roll_dice()      
+    print("\n")
+    
+    dice.roll_dice()
+    print("\n")
+    print(f"{player_actions.current_player}")
+    player_actions.draw()
     print("Player 1 Hand: ")
     for cards in player1:
         print(cards)
@@ -216,11 +221,7 @@ def main():
     
     print("\nTop of Discard")
     print(hand.top_of_discard)
-        
+   
 if __name__ == "__main__":
     main()
-if __name__ == "__main__":
-    main()
-
-
 
