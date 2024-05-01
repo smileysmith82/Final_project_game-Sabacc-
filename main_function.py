@@ -1,5 +1,5 @@
-import random
-import pygame 
+import pygame
+from deck_and_hand import Card, Deck, Hand, Dice, Player_Action
 
 WIDTH, HEIGHT = 1000, 800
 WIN = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -13,16 +13,28 @@ pygame.init()
 
 round_counter = 0
 
-discard_pile = ['r_10_t.png', 'g_2_s.png']
-player1_hand = ['r_10_s.png', 'sylops.png',]
-player2_hand = ['g_4_t.png', 'r_2_s.png']
-dealer_hand = ['down_backside.png', 'down_backside.png']
+def load_image(card):
+    if card.rank == 12:
+        image_path = "up_backside"
+    elif card.rank == 11:
+        image_path = "down_backside"
+    elif card.rank == 0:
+        image_path = "sylops"
+    elif card.rank > 0:
+        image_path = f"g_{card.rank}_{card.suit.lower()[0]}"
+    elif card.rank < 0:
+        image_path = f"r_{abs(card.rank)}_{card.suit.lower()[0]}"
 
-def load_image(image_path):
+    image_path += ".png"
+    image = pygame.image.load(image_path)
+    if card.rank == 0:
+        return pygame.transform.scale(image, (IMAGE_WIDTH, IMAGE_HEIGHT * 2))
+    else:
+        return pygame.transform.scale(image, (IMAGE_WIDTH, IMAGE_HEIGHT))
+
+    image_path += ".png"  # Include the file extension for all other cards
     image = pygame.image.load(image_path)
     return pygame.transform.scale(image, (IMAGE_WIDTH, IMAGE_HEIGHT))
-
-card_images = {card: load_image(card) for card in discard_pile + player1_hand + dealer_hand} # Load card images
 
 def display_dealer_hand(hand):
     card_spacing = 20
@@ -40,8 +52,8 @@ def display_hand(hand):
     for i, card in enumerate(hand):
         WIN.blit(card_images[card], (x_offset + i * (IMAGE_WIDTH + card_spacing), y_offset))
 
-def display_deck():
-    main_deck_back_image = load_image("up_backside.png")
+def display_deck(front_of_card):
+    main_deck_back_image = load_image(front_of_card)
     deck_width = IMAGE_WIDTH * 2 + 20
     x_deck_offset = (WIDTH - deck_width) // 2
     WIN.blit(main_deck_back_image, (x_deck_offset, 250))
@@ -92,15 +104,13 @@ def stand_function():
 def draw_function():
     print("Draw")
 
-def switch_function(selected_card_index):
+def switch_function(selected_card_index, hand):
     global discard_pile, player1_hand
-    if selected_card_index is not None and len(discard_pile) > 0 and 0 <= selected_card_index < len(player1_hand):
-        selected_card = player1_hand[selected_card_index]
-        player1_hand[selected_card_index] = discard_pile.pop()
-        discard_pile.append(selected_card)
-
-    print(player1_hand)
-    print(discard_pile)
+    if selected_card_index is not None and len(hand.discard_pile) > 0 and 0 <= selected_card_index < len(hand.player1_hand):
+        selected_card = hand.player1_hand[selected_card_index]
+        hand.player1_hand[selected_card_index] = hand.discard_pile.pop()
+        hand.discard_pile.append(selected_card)
+        turn = "player2"
 
 def fold_function():
     global round_counter
@@ -133,51 +143,51 @@ def detect_hover(mouse_pos, hand, x_offset, y_offset, discard_rect, discard_pile
     for i, card in enumerate(hand):
         card_rect = pygame.Rect(x_offset + i * (card_width + card_spacing), y_offset, card_width, card_height)
         if card_rect.collidepoint(mouse_pos):
-            if card == "sylops.png":
+            if card.rank == 0:
                 return "Sylops (0)"
             else:
                 card_value = ""
-                if card[0] == "r":
+                if card.rank < 0:
                     card_value = "-"
-                elif card[0] == "g":
+                elif card.rank > 0:
                     card_value = "+"
-                card_value += card.split("_")[1]
+                card_value += str(abs(card.rank))
                 return card_value
     
     # Check if the mouse is over the discard pile
     if discard_rect.collidepoint(mouse_pos):
         if discard_pile:
-            if discard_pile[-1] == "sylops.png":
+            if discard_pile[-1].rank == 0:
                 return "Sylops (0)"
             else:
                 top_card_value = ""
-                if discard_pile[-1][0] == "r":
+                if discard_pile[-1].rank < 0:
                     top_card_value = "-"
-                elif discard_pile[-1][0] == "g":
+                elif discard_pile[-1].rank > 0:
                     top_card_value = "+"
-                top_card_value += discard_pile[-1].split("_")[1]
+                top_card_value += str(abs(discard_pile[-1].rank))
                 return top_card_value
         else:
             return "Empty discard pile"
     
     return None
-#in deck and hand file (REMOVE)
-class Dice():
-    def __init__(self):
-        self.die1 = [1,2,3,4,5,6]
-        self.die2 = [1,2,3,4,5,6]
-        
-    def roll_dice(self, round_counter):
-        dice1= random.choice(self.die1)
-        dice2= random.choice(self.die2)
-            
-        round_counter += 1
-        
-        return dice1, dice2, round_counter
-
-dice = Dice()
 
 def main():
+    deck = Deck()
+    deck.shuffle()
+    hand = Hand(deck.shuffled_deck)
+    hand.starting_deal(2)
+    player1 = hand.player1_hand
+    player2 = hand.player2_hand
+    turn = "Player1"
+    discard_pile = hand.discard_pile
+    back_of_card = Card('11', '_')
+    front_of_card = Card('12', '_')
+    dealer_back_hand = [back_of_card, back_of_card]
+    
+    global card_images
+    card_images = {card: load_image(card) for card in hand.discard_pile + hand.player1_hand + dealer_back_hand} # Load card images
+
     global round_counter
     run = True
     clock = pygame.time.Clock()
@@ -195,9 +205,6 @@ def main():
     discard_rect = pygame.Rect((WIDTH - IMAGE_WIDTH * 2 - 20) // 2 + 120, 250, IMAGE_WIDTH, IMAGE_HEIGHT)
     selected_card_index = None
     switch_button_clicked = False  # Flag to track switch button click
-    
-    # Roll the dice and update round counter
-    dice1, dice2, round_counter = dice.roll_dice(round_counter) 
 
     while run:
         mouse_pos = pygame.mouse.get_pos()
@@ -227,14 +234,14 @@ def main():
                 if switch_button_clicked:  # Check if switch button is clicked
                     card_spacing = 20
                     card_width, card_height = IMAGE_WIDTH, IMAGE_HEIGHT
-                    hand_width = len(player1_hand) * card_width + (len(player1_hand) - 1) * card_spacing
+                    hand_width = len(hand.player1_hand) * card_width + (len(hand.player1_hand) - 1) * card_spacing
                     x_offset = (WIDTH - hand_width) // 2
                     y_offset = HEIGHT - 300
-                    for i in range(len(player1_hand)):
+                    for i in range(len(hand.player1_hand)):
                         card_rect = pygame.Rect(x_offset + i * (card_width + card_spacing), y_offset, card_width, card_height)
                         if card_rect.collidepoint(event.pos):
                             selected_card_index = i
-                            switch_function(selected_card_index)  # Call switch function with selected card index
+                            switch_function(selected_card_index, hand)  # Call switch function with selected card index
                             switch_button_clicked = False  # Reset switch button clicked flag
                         else:
                             selected_card_index = None
@@ -243,19 +250,19 @@ def main():
 
         quit_button(WIN, font, 'Quit', WIDTH - 120, 20, (255, 0, 0), (200, 0, 0))
         
-        round_text = font.render(f"Round: {round_counter} Dice 1: {dice1} Dice 2: {dice2}", True, color)
+        round_text = font.render(f"Round: {round_counter}", True, color)
         WIN.blit(round_text, (20, 20))
 
         draw_button(WIN, font, 'Start', color, button_x, button_y, color_light_blue, color_dark_blue)
         for i, label in enumerate(["Draw", "Switch", "Fold", "Stand"], start=1):
             draw_button(WIN, font, label, color, button_x - i * (140 + button_spacing), button_y, color_light_blue, color_dark_blue)
 
-        display_hand(player1_hand)
-        display_dealer_hand(dealer_hand)
-        display_deck()
+        display_hand(hand.player1_hand)
+        display_dealer_hand(dealer_back_hand)
+        display_deck(front_of_card)
         display_discard(discard_pile)
 
-        hovered_card_player = detect_hover(mouse_pos, player1_hand, (WIDTH - len(player1_hand) * IMAGE_WIDTH - (len(player1_hand) - 1) * 20) // 2, HEIGHT - 300, discard_rect, discard_pile)
+        hovered_card_player = detect_hover(mouse_pos, hand.player1_hand, (WIDTH - len(hand.player1_hand) * IMAGE_WIDTH - (len(hand.player1_hand) - 1) * 20) // 2, HEIGHT - 300, discard_rect, hand.discard_pile)
         if hovered_card_player:
             if hovered_card_player == "discard_pile":
                 if discard_pile:
