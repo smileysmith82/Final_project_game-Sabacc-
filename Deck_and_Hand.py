@@ -1,5 +1,6 @@
 import random
 import copy
+import time
 
 class Card():
     def __init__(self, rank, suit):
@@ -87,21 +88,21 @@ class AI_Player():
         total = hand.total_player2()
         return total
 
+            
     def make_move(self, player_actions):
         if self.calculate_total(player_actions.hand) == 0:
-            player_actions.stand()
-            
-        elif player_actions.hand.top_of_discard is not None:
+            player_actions.stand()        
+        else:
             for card in player_actions.player2_hand:
                 new_total = (player_actions.hand.total_player2() - card.rank)
-                if new_total + player_actions.hand.top_of_discard.rank <= abs(1):
-                    player_actions.player2_hand.append(player_actions.hand.top_of_discard)
+                if new_total + player_actions.hand.top_of_discard.rank == 0:
+                    player_actions.player2_hand.append(player_actions.hand.discard_pile.pop())
                     player_actions.hand.discard_pile.append(card)
                     player_actions.hand.update_discard()
-            player_actions.next_turn()
-        else:
+                    player_actions.next_turn()
             player_actions.draw()
-            
+
+
 class Player_Actions():
     def __init__(self, player1_hand, player2_hand, hand):
         self.player1_hand = player1_hand
@@ -117,6 +118,7 @@ class Player_Actions():
     def next_turn(self):
         self.current_player_idx = (self.current_player_idx + 1) % self.num_players
         if self.current_player == "Player2":
+            time.sleep(1)
             self.ai_player.make_move(self)
             
     @property    #this section of code was causing mountains of issue, so the answer came courtesy of chatgpt
@@ -139,7 +141,7 @@ class Player_Actions():
             
         elif self.current_player == "Player2":
             self.player2_hand.append(self.hand.draw_pile.pop())
-            self.hand.player1_len +=1
+            self.hand.player2_len +=1
             self.hand.update_discard()
             self.dice.roll_dice()
         
@@ -224,18 +226,20 @@ def main():
     hand.update_discard()
     print(hand.top_of_discard)
     player_actions = Player_Actions(player1, player2, hand)  # Create an instance of Player_Actions
-    player_actions.draw()
-    dice = Dice(player_actions, hand)
-    print("\n")
-    print("Player 1 Hand: ")
-    for cards in player1:
-        print(cards)
+    print(f"{player_actions.current_player}")
+    player_actions.stand()
+    
+    
+    #print("Player 1 Hand: ")
+    #for cards in player1:
+    #    print(cards)
         
     print("\nPlayer 2 Hand: ")
     for cards in player2:
         print(cards)
-    
-    
+    print("\nTop of Discard")
+    print(hand.top_of_discard)
+    """
     print("\n")
     print(f"{player_actions.current_player}")
     print("Player 1 Hand: ")
@@ -246,9 +250,7 @@ def main():
     for cards in player2:
         print(cards)
     
-    print("\nTop of Discard")
-    print(hand.top_of_discard)
+    """
    
 if __name__ == "__main__":
     main()
-
