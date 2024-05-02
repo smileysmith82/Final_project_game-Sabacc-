@@ -6,20 +6,19 @@ import Deck_and_Hand
 class AI_Player():
     
     def calculate_total(self, hand):
-        total = Deck_and_Hand.total_player2(hand)
+        total = hand.total_player2()
         return total
 
-    def make_move(self, discard_top, draw_pile):
-        if self.calculate_total() == 0:
-            Deck_and_Hand.stand()
             
-        elif discard_top is not None:
-            for card in self.hand:
-                new_total = (total - card.rank)
-                if new_total + discard_top.rank <= abs(1):
-                    player2_hand.append(discard_pile[-1])
-                    discard_pile.pop()
-                    dealer_hand.append('down_backside.png')
-                    
+    def make_move(self, player_actions):
+        if self.calculate_total(player_actions.hand) == 0:
+            player_actions.stand()        
         else:
-            Deck_and_Hand.draw()
+            for card in player_actions.player2_hand:
+                new_total = (player_actions.hand.total_player2() - card.rank)
+                if new_total + player_actions.hand.top_of_discard.rank == 0:
+                    player_actions.player2_hand.append(player_actions.hand.discard_pile.pop())
+                    player_actions.hand.discard_pile.append(card)
+                    player_actions.hand.update_discard()
+                    player_actions.next_turn()
+            player_actions.draw()
