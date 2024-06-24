@@ -1,5 +1,5 @@
 import pygame
-from deck_and_hand import Card, Deck, Hand, Dice, Player_Action
+from deck_and_hand import Card, Deck, Hand, Dice, Player_Actions
 
 WIDTH, HEIGHT = 1000, 800
 WIN = pygame.display.set_mode((WIDTH, HEIGHT))
